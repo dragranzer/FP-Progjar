@@ -1,10 +1,41 @@
-import java.util.*;
+import java.util.Arrays;
+import java.util.Random;
+import java.util.Scanner;
 
 public class CariUbi {
-    static int[][] tanah = new int[100][100];
-    static int[][] ubi = new int[100][100];
+    private int[][] tanah;
+    private int[][] ubi;
 
-    public static void cariubi() {
+    public CariUbi(int[][] tanah, int[][] ubi){
+        this.tanah = tanah;
+        this.ubi = ubi;
+    }
+
+    public void set1Ubi(int x, int y, int value) {
+        ubi[x][y] = value;
+    }
+
+    public int get1Ubi(int x, int y) {
+        return ubi[x][y];
+    }
+
+    public int get1Tanah(int x, int y) {
+        return tanah[x][y];
+    }
+
+    public void set1Tanah(int x, int y, int value) {
+        tanah[x][y] = value;
+    }
+
+    public int[][] getTanah() {
+        return tanah;
+    }
+
+    public int[][] getUbi() {
+        return ubi;
+    }
+
+    public void cariubi() {
         int ubii=10, x, y;
         Player player = new Player();
         player.setPoint(0);
@@ -18,7 +49,7 @@ public class CariUbi {
             x = sc.nextInt();
             y = sc.nextInt();
 
-            tanah[x][y]=ubi[x][y]+48;
+            tanah[x][y] = ubi[x][y]+48;
             System.out.println(tanah[x][y] + " " + ubi[x][y]);
 
             if(ubi[x][y]== -1){
@@ -35,7 +66,7 @@ public class CariUbi {
         System.out.println("Poin akhir kamu : "+ player.getPoint());
     }
 
-    public static void main(String[] args) {
+    public void init() {
         for (int[] row: tanah)
             Arrays.fill(row, 0);
         for (int[] row: ubi)
@@ -67,7 +98,7 @@ public class CariUbi {
 //            cariubi();
     }
 
-    public static void operation(Player player, Integer value){
+    public void operation(Player player, Integer value){
         int choice;
         Scanner sc = new Scanner(System.in);
         System.out.println("""
@@ -87,7 +118,7 @@ public class CariUbi {
         System.out.println("Point kamu menjadi : " + player.getPoint());
     }
 
-    public static void printPetak(){
+    public void printPetak(){
         System.out.print("\n   ");
         for(int c = 0; c<10; c++){
             System.out.format(Log.ANSI_YELLOW + "%2d " + Log.ANSI_RESET, c);
