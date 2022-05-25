@@ -42,9 +42,7 @@ public class ThreadClient extends Thread {
                                 if(ubi[a][b] == -1)
                                     System.out.format("%2c ", '-');
                                 else
-//                    System.out.format("%2d ", ubi[a][b]);
                                     System.out.format("%2c ", tanah[a][b]);
-//                    System.out.print(tanah[a][b]+" ");
                             }
                         }
                         System.out.println("\n");

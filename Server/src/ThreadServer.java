@@ -140,25 +140,8 @@ public class ThreadServer extends Thread {
         tc.sendGame(game);
     }
 
-    public void playGame(Game game) throws IOException {
-        String clientName = game.getUsername();
-        String clientId = this.clientNameList.get(clientName);
-        ThreadClient tc = this.clientList.get(clientId);
-
-        Map map = this.clientGame.get(clientName);
-        int[][] tanah = map.getTanah();
-        int[][] ubi = map.getUbi();
-
-        CariUbi app = new CariUbi(tanah, ubi);
-        app.init();
-
-        map.setTanah(app.getTanah());
-        map.setUbi(app.getUbi());
-        game.setTanah(app.getTanah());
-        game.setUbi(app.getUbi());
-        game.setPrintPetak(true);
-
-        this.clientGame.replace(clientName, map);
-        tc.sendGame(game);
+    public void playGame(Koordinat koordinat) throws IOException {
+        System.out.println("Koorinat diterima");
+        System.out.println(koordinat.getX()+koordinat.getY());
     }
 }
