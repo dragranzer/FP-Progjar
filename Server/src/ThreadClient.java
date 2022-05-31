@@ -26,6 +26,7 @@ public class ThreadClient extends Thread {
     public void sendGame(Game game) throws IOException {
         this.objectOutputStream.writeObject(game);
         this.objectOutputStream.flush();
+        this.objectOutputStream.reset();
     }
 
     @Override
@@ -55,7 +56,6 @@ public class ThreadClient extends Thread {
 //                    else
 //                        this.threadServer.playGame(game);
                 }else if(obj instanceof Koordinat koordinat){
-                    System.out.println("Koorinat diterima");
                     this.threadServer.playGame(koordinat);
                 }
             } catch (IOException | ClassNotFoundException e) {

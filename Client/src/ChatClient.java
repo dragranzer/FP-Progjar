@@ -56,8 +56,6 @@ public class ChatClient {
                             objectOutputStream.flush();
 
                             int x=-1,y=-1;
-                            objectOutputStream.writeObject(KoordinatObject.sendKoordinat(x,y));
-                            objectOutputStream.flush();
                             do{
                                 System.out.println("Masukkan Koordinat X Y");
                                 Scanner scInt = new Scanner(System.in);
@@ -66,7 +64,7 @@ public class ChatClient {
 
                                 if(x==-1 && y==-1)break;
 
-                                objectOutputStream.writeObject(KoordinatObject.sendKoordinat(x,y));
+                                objectOutputStream.writeObject(KoordinatObject.sendKoordinat(x,y,username));
                                 objectOutputStream.flush();
 
                             }while(x!=-1 && y!=-1);

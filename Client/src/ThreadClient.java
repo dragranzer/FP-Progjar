@@ -41,14 +41,17 @@ public class ThreadClient extends Thread {
                             for(int b=0; b<10; b++){
                                 if(ubi[a][b] == -1)
                                     System.out.format("%2c ", '-');
-                                else
+                                else if(tanah[a][b]=='-')
                                     System.out.format("%2c ", tanah[a][b]);
+                                else if(tanah[a][b]==0)
+                                    System.out.format(" %d ", ubi[a][b]);
                             }
                         }
                         System.out.println("\n");
                     }
-                }
+                }else if(obj instanceof Koordinat koordinat){
 
+                }
 
             } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();

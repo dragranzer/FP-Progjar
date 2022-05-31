@@ -141,7 +141,29 @@ public class ThreadServer extends Thread {
     }
 
     public void playGame(Koordinat koordinat) throws IOException {
-        System.out.println("Koorinat diterima");
-        System.out.println(koordinat.getX()+koordinat.getY());
+        Integer x = koordinat.getX();
+        Integer y = koordinat.getY();
+
+        String clientName = koordinat.getUsername();
+        String clientId = this.clientNameList.get(clientName);
+        ThreadClient tc = this.clientList.get(clientId);
+
+        Map map = this.clientGame.get(clientName);
+        int[][] tanah = map.getTanah();
+        int[][] ubi = map.getUbi();
+
+        tanah[y][x]=0;
+        System.out.println(tanah[y][x]);
+
+        map.setTanah(tanah);
+        map.setUbi(ubi);
+
+        Game game = new Game();
+        game.setTanah(tanah);
+        game.setUbi(ubi);
+        game.setPrintPetak(true);
+
+        this.clientGame.replace(clientName, map);
+        tc.sendGame(game);
     }
 }
