@@ -4,6 +4,7 @@ public class Koordinat implements Serializable {
     private Integer x;
     private Integer y;
     private String username;
+    private String operation;
     private int[][] tanah;
     private int[][] ubi;
 
@@ -45,5 +46,13 @@ public class Koordinat implements Serializable {
 
     public void setUbi(int[][] ubi) {
         this.ubi = ubi;
+    }
+
+    public String getOperation() {
+        return operation;
+    }
+
+    public void setOperation(String operation) {
+        this.operation = operation;
     }
 }

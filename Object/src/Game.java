@@ -5,8 +5,10 @@ public class Game implements Serializable {
     private int[][] ubi;
 
     private Boolean printPetak;
+    private Boolean enterOperate;
     private Boolean newGame;
     private String username;
+    private Integer point;
 
     private int x;
     private int y;
@@ -67,5 +69,21 @@ public class Game implements Serializable {
 
     public void setY(int y) {
         this.y = y;
+    }
+
+    public Boolean getEnterOperate() {
+        return enterOperate;
+    }
+
+    public void setEnterOperate(Boolean enterOperate) {
+        this.enterOperate = enterOperate;
+    }
+
+    public Integer getPoint() {
+        return point;
+    }
+
+    public void setPoint(Integer point) {
+        this.point = point;
     }
 }

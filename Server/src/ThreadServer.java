@@ -10,12 +10,14 @@ public class ThreadServer extends Thread {
     private Hashtable<String, String> clientNameList;
     private Hashtable<String, Map> clientGame;
     private ServerSocket serverSocket;
+    private Hashtable<String, Integer> clientPoint;
 
     public ThreadServer() throws IOException {
         this.clientList = new Hashtable<>();
         this.clientNameList = new Hashtable<>();
         this.clientGame = new Hashtable<>();
         this.serverSocket = new ServerSocket(6666);
+        this.clientPoint = new Hashtable<>();
     }
 
     @Override
@@ -34,6 +36,7 @@ public class ThreadServer extends Thread {
                 // store the new thread to the hashtable
                 String clientId = socket.getInetAddress().getHostAddress() + ":" + socket.getPort();
                 this.clientList.put(clientId, threadClient);
+                this.clientPoint.put(clientId, 0);
 //                System.out.println("Finish");
             } catch (IOException e) {
                 e.printStackTrace();
@@ -162,8 +165,16 @@ public class ThreadServer extends Thread {
         game.setTanah(tanah);
         game.setUbi(ubi);
         game.setPrintPetak(true);
+        game.setEnterOperate(true);
+        game.setUsername(clientName);
+        game.setPoint(ubi[y][x]);
 
         this.clientGame.replace(clientName, map);
         tc.sendGame(game);
+    }
+
+    public void changePoint(PlayerPoint playerpoint) throws IOException {
+        String username = playerpoint.getUsername();
+        System.out.println((username));
     }
 }

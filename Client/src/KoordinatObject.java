@@ -6,4 +6,10 @@ public class KoordinatObject {
         koordinat.setUsername(username);
         return koordinat;
     }
+
+    public static Koordinat sendOperate(String operation){
+        Koordinat koordinat = new Koordinat();
+        koordinat.setOperation(operation);
+        return koordinat;
+    }
 }

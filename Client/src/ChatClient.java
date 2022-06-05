@@ -18,7 +18,7 @@ public class ChatClient {
                 online = true;
 
                 ObjectOutputStream objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
-                ThreadClient threadClient = new ThreadClient(new ObjectInputStream(socket.getInputStream()));
+                ThreadClient threadClient = new ThreadClient(new ObjectInputStream(socket.getInputStream()), username);
                 threadClient.start();
 
                 objectOutputStream.writeObject(UserObject.getLogin(username));
@@ -57,7 +57,7 @@ public class ChatClient {
 
                             int x=-1,y=-1;
                             do{
-                                System.out.println("Masukkan Koordinat X Y");
+
                                 Scanner scInt = new Scanner(System.in);
                                 x = scInt.nextInt();
                                 y = scInt.nextInt();

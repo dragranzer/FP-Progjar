@@ -57,6 +57,12 @@ public class ThreadClient extends Thread {
 //                        this.threadServer.playGame(game);
                 }else if(obj instanceof Koordinat koordinat){
                     this.threadServer.playGame(koordinat);
+                    String test = ((Koordinat) obj).getOperation();
+                    System.out.println(test);
+                }else if(obj instanceof PlayerPoint playerPoint){
+                    System.out.println("masuk");
+                    System.out.println(playerPoint.getUsername());
+                    this.threadServer.changePoint(playerPoint);
                 }
             } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();
