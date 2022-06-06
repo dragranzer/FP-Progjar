@@ -2,15 +2,13 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.*;
-import java.util.Scanner;
 
 public class ChatClient {
     public static void main(String[] args) {
         boolean online;
         Read sc = new Read();
         try {
-            while (true) {
+//            while (true) {
                 Socket socket = new Socket("localhost", 6666);
 
                 Cli.login();
@@ -18,13 +16,13 @@ public class ChatClient {
                 online = true;
 
                 ObjectOutputStream objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
-                ThreadClient threadClient = new ThreadClient(new ObjectInputStream(socket.getInputStream()), username);
+                ThreadClient threadClient = new ThreadClient(new ObjectInputStream(socket.getInputStream()));
                 threadClient.start();
 
                 objectOutputStream.writeObject(UserObject.getLogin(username));
                 objectOutputStream.flush();
 
-                do {
+//                do {
                     Cli.welcome();
                     String task = sc.ReadString();
                     switch (task) {
@@ -55,19 +53,6 @@ public class ChatClient {
                             objectOutputStream.writeObject(GameObject.newGame(username));
                             objectOutputStream.flush();
 
-                            int x=-1,y=-1;
-                            do{
-
-                                Scanner scInt = new Scanner(System.in);
-                                x = scInt.nextInt();
-                                y = scInt.nextInt();
-
-                                if(x==-1 && y==-1)break;
-
-                                objectOutputStream.writeObject(KoordinatObject.sendKoordinat(x,y,username));
-                                objectOutputStream.flush();
-
-                            }while(x!=-1 && y!=-1);
                         }
                         case "4" -> {
                             objectOutputStream.writeObject(UserObject.getLogout(username));
@@ -76,8 +61,8 @@ public class ChatClient {
                             online = false;
                         }
                     }
-                } while (online);
-            }
+//                } while (online);
+//            }
         } catch (IOException e) {
             e.printStackTrace();
         }

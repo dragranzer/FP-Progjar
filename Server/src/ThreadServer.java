@@ -36,7 +36,6 @@ public class ThreadServer extends Thread {
                 // store the new thread to the hashtable
                 String clientId = socket.getInetAddress().getHostAddress() + ":" + socket.getPort();
                 this.clientList.put(clientId, threadClient);
-                this.clientPoint.put(clientId, 0);
 //                System.out.println("Finish");
             } catch (IOException e) {
                 e.printStackTrace();
@@ -138,7 +137,9 @@ public class ThreadServer extends Thread {
         game.setTanah(app.getTanah());
         game.setUbi(app.getUbi());
         game.setPrintPetak(true);
+        game.setPoint(0);
 
+        this.clientPoint.put(game.getUsername(), 0);
         this.clientGame.replace(clientName, map);
         tc.sendGame(game);
     }
@@ -157,6 +158,7 @@ public class ThreadServer extends Thread {
 
         tanah[y][x]=0;
         System.out.println(tanah[y][x]);
+        System.out.println(ubi[y][x]);
 
         map.setTanah(tanah);
         map.setUbi(ubi);
@@ -176,5 +178,30 @@ public class ThreadServer extends Thread {
     public void changePoint(PlayerPoint playerpoint) throws IOException {
         String username = playerpoint.getUsername();
         System.out.println((username));
+
+        String operation = playerpoint.getOperation();
+        Integer userPoint = this.clientPoint.get(username);
+
+        System.out.println("before op " + userPoint);
+
+        Integer value = playerpoint.getPoint();
+
+        Player player = new Player();
+        player.setPoint(userPoint);
+        switch (operation){
+            case "+" -> player.plus(value);
+            case "-" -> player.minus(value);
+            case "*" -> player.times(value);
+            case "/" -> player.divide(value);
+        }
+
+        value = player.getPoint();
+        System.out.println("after op " + value);
+        playerpoint.setPoint(value);
+        this.clientPoint.replace(username, value);
+
+        String clientId = this.clientNameList.get(username);
+        ThreadClient tc = this.clientList.get(clientId);
+        tc.sendPoint(playerpoint);
     }
 }

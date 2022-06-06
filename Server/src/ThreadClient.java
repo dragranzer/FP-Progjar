@@ -29,6 +29,12 @@ public class ThreadClient extends Thread {
         this.objectOutputStream.reset();
     }
 
+    public void sendPoint(PlayerPoint playerPoint) throws IOException {
+        this.objectOutputStream.writeObject(playerPoint);
+        this.objectOutputStream.flush();
+        this.objectOutputStream.reset();
+    }
+
     @Override
     public void run() {
         while (true) {
@@ -57,8 +63,6 @@ public class ThreadClient extends Thread {
 //                        this.threadServer.playGame(game);
                 }else if(obj instanceof Koordinat koordinat){
                     this.threadServer.playGame(koordinat);
-                    String test = ((Koordinat) obj).getOperation();
-                    System.out.println(test);
                 }else if(obj instanceof PlayerPoint playerPoint){
                     System.out.println("masuk");
                     System.out.println(playerPoint.getUsername());
