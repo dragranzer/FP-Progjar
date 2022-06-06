@@ -28,11 +28,15 @@ public class ThreadClient extends Thread {
                 objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
 
                 try {
+                    System.out.println("masuk proc");
                     Object obj = this.objectInputStream.readObject();
                     if(obj instanceof Message message){
                         messageProcess(message);
                     }
                     if(obj instanceof Game game){
+                        if(game.getNewGame()){
+                            System.out.println("Ketik start untuk mulai:");
+                        }
                         gameProcess(game);
                     }
 
@@ -64,10 +68,15 @@ public class ThreadClient extends Thread {
         int x = 0,y = 0;
         boolean printPoint = false;
         if(game.getPrintPetak()){
+            if(game.getNewGame()){
+                Read sc = new Read();
+                String username = sc.ReadString();
+            }
             printPetak(game);
         }
         do{
             if(!printPoint){
+
                 System.out.println("Masukkan Koordinat X Y");
                 Scanner scInt = new Scanner(System.in);
                 x = scInt.nextInt();
@@ -75,7 +84,11 @@ public class ThreadClient extends Thread {
 
                 if(x==-1 && y==-1)break;
 
-                objectOutputStream.writeObject(KoordinatObject.sendKoordinat(x,y,game.getUsername()));
+                System.out.println("idRoom: " + game.getIdRoom());
+
+                Integer idRoom = game.getIdRoom();
+
+                objectOutputStream.writeObject(KoordinatObject.sendKoordinat(x,y,game.getUsername(),idRoom));
                 objectOutputStream.flush();
 
                 printPoint = true;

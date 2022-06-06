@@ -9,6 +9,7 @@ public class Game implements Serializable {
     private Boolean newGame;
     private String username;
     private Integer point;
+    private Integer idRoom;
 
     private int x;
     private int y;
@@ -85,5 +86,13 @@ public class Game implements Serializable {
 
     public void setPoint(Integer point) {
         this.point = point;
+    }
+
+    public Integer getIdRoom() {
+        return idRoom;
+    }
+
+    public void setIdRoom(Integer idRoom) {
+        this.idRoom = idRoom;
     }
 }

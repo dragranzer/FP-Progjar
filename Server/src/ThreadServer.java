@@ -8,9 +8,11 @@ import java.util.Set;
 public class ThreadServer extends Thread {
     private Hashtable<String, ThreadClient> clientList;
     private Hashtable<String, String> clientNameList;
-    private Hashtable<String, Map> clientGame;
+    private Hashtable<Integer, Map> clientGame;
     private ServerSocket serverSocket;
     private Hashtable<String, Integer> clientPoint;
+    private Hashtable<String, Integer> clientRoom;
+    private Integer IdRoom;
 
     public ThreadServer() throws IOException {
         this.clientList = new Hashtable<>();
@@ -18,6 +20,8 @@ public class ThreadServer extends Thread {
         this.clientGame = new Hashtable<>();
         this.serverSocket = new ServerSocket(6666);
         this.clientPoint = new Hashtable<>();
+        this.clientRoom = new Hashtable<>();
+        this.IdRoom = 0;
     }
 
     @Override
@@ -80,7 +84,6 @@ public class ThreadServer extends Thread {
             String clientId = e.nextElement();
             if (!this.clientNameList.containsValue(clientId)){
                 this.clientNameList.put(nameClient, clientId);
-                this.clientGame.put(nameClient, new Map());
             }
         }
         System.out.println(this.clientNameList);
@@ -125,7 +128,10 @@ public class ThreadServer extends Thread {
         String clientId = this.clientNameList.get(clientName);
         ThreadClient tc = this.clientList.get(clientId);
 
-        Map map = this.clientGame.get(clientName);
+        if(!this.clientGame.containsKey(this.IdRoom)){
+            this.clientGame.put(this.IdRoom, new Map());
+        }
+        Map map = this.clientGame.get(this.IdRoom);
         int[][] tanah = map.getTanah();
         int[][] ubi = map.getUbi();
 
@@ -138,9 +144,13 @@ public class ThreadServer extends Thread {
         game.setUbi(app.getUbi());
         game.setPrintPetak(true);
         game.setPoint(0);
+        game.setIdRoom(this.IdRoom);
+        game.setNewGame(true);
 
         this.clientPoint.put(game.getUsername(), 0);
-        this.clientGame.replace(clientName, map);
+        this.clientGame.replace(this.IdRoom, map);
+        this.IdRoom = this.IdRoom + 1;
+        System.out.println("masuk send");
         tc.sendGame(game);
     }
 
@@ -152,7 +162,7 @@ public class ThreadServer extends Thread {
         String clientId = this.clientNameList.get(clientName);
         ThreadClient tc = this.clientList.get(clientId);
 
-        Map map = this.clientGame.get(clientName);
+        Map map = this.clientGame.get(koordinat.getIdRoom());
         int[][] tanah = map.getTanah();
         int[][] ubi = map.getUbi();
 
@@ -171,7 +181,7 @@ public class ThreadServer extends Thread {
         game.setUsername(clientName);
         game.setPoint(ubi[y][x]);
 
-        this.clientGame.replace(clientName, map);
+        this.clientGame.replace(koordinat.getIdRoom(), map);
         tc.sendGame(game);
     }
 
@@ -204,4 +214,12 @@ public class ThreadServer extends Thread {
         ThreadClient tc = this.clientList.get(clientId);
         tc.sendPoint(playerpoint);
     }
+
+    public void joinRoom(Game game) throws IOException {
+        Integer idRoom = game.getIdRoom();
+        String username = game.getUsername();
+        System.out.println(idRoom + " " + username);
+
+    }
+
 }

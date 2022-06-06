@@ -2,6 +2,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.Scanner;
 
 public class ChatClient {
     public static void main(String[] args) {
@@ -50,9 +51,21 @@ public class ChatClient {
                             objectOutputStream.flush();
                         }
                         case "3" -> {
-                            objectOutputStream.writeObject(GameObject.newGame(username));
-                            objectOutputStream.flush();
-
+                            System.out.println("Apakah anda ingin:");
+                            System.out.println("1. Create Room");
+                            System.out.println("2. Join Room");
+                            Integer choice;
+                            Scanner scInt = new Scanner(System.in);
+                            choice = scInt.nextInt();
+                            if(choice == 1){
+                                objectOutputStream.writeObject(GameObject.newGame(username));
+                                objectOutputStream.flush();
+                            }else if(choice == 2){
+                                System.out.println("Masukkan id Room:");
+                                Integer idRoom = scInt.nextInt();
+                                objectOutputStream.writeObject(GameObject.joinGame(idRoom,username));
+                                objectOutputStream.flush();
+                            }
                         }
                         case "4" -> {
                             objectOutputStream.writeObject(UserObject.getLogout(username));

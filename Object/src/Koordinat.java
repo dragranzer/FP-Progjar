@@ -4,6 +4,7 @@ public class Koordinat implements Serializable {
     private Integer x;
     private Integer y;
     private String username;
+    private Integer idRoom;
     private int[][] tanah;
     private int[][] ubi;
 
@@ -47,4 +48,11 @@ public class Koordinat implements Serializable {
         this.ubi = ubi;
     }
 
+    public Integer getIdRoom() {
+        return idRoom;
+    }
+
+    public void setIdRoom(Integer idRoom) {
+        this.idRoom = idRoom;
+    }
 }
