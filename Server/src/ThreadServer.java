@@ -219,7 +219,7 @@ public class ThreadServer extends Thread {
         Integer idRoom = game.getIdRoom();
         String username = game.getUsername();
         System.out.println(idRoom + " " + username);
-
+        this.clientRoom.put(username, idRoom);
     }
 
 }
