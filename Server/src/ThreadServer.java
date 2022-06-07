@@ -3,16 +3,18 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Scanner;
 import java.util.Set;
 
 public class ThreadServer extends Thread {
     private Hashtable<String, ThreadClient> clientList;
     private Hashtable<String, String> clientNameList;
     private Hashtable<Integer, Map> clientGame;
-    private ServerSocket serverSocket;
     private Hashtable<String, Integer> clientPoint;
     private Hashtable<String, Integer> clientRoom;
     private Integer IdRoom;
+    private ServerSocket serverSocket;
+
 
     public ThreadServer() throws IOException {
         this.clientList = new Hashtable<>();
@@ -130,7 +132,12 @@ public class ThreadServer extends Thread {
 
         if(!this.clientGame.containsKey(this.IdRoom)){
             this.clientGame.put(this.IdRoom, new Map());
-        }
+            System.out.println("Berhasil membuat room");
+            this.clientRoom.put(clientName, this.IdRoom);
+            System.out.println("Host Room "+ this.IdRoom + "= " + clientName);
+        } else
+            System.out.println("Gagal membuat room");
+
         Map map = this.clientGame.get(this.IdRoom);
         int[][] tanah = map.getTanah();
         int[][] ubi = map.getUbi();
@@ -218,8 +225,53 @@ public class ThreadServer extends Thread {
     public void joinRoom(Game game) throws IOException {
         Integer idRoom = game.getIdRoom();
         String username = game.getUsername();
-        System.out.println(idRoom + " " + username);
+        System.out.println("JOIN ROOM " + idRoom + " " + username);
         this.clientRoom.put(username, idRoom);
+
+        String clientId = this.clientNameList.get(username);
+        ThreadClient tc = this.clientList.get(clientId);
+        Message msg = new Message();
+
+        //toRoom
+//        joinedNotify(msg, game);
+
+        //to self
+        msg.setText(Log.ANSI_RED + "Waiting for host to start the game.." + Log.ANSI_RESET);
+        msg.setSender("Room "+ idRoom);
+        msg.setReceiver(username);
+        msg.setRequest(false);
+        msg.setChannel("3");
+        tc.send(msg);
+        System.out.println("TO SELF");
     }
 
+    public void dataGameProcess(Game game) throws IOException, ClassNotFoundException {
+
+    }
+
+    public void joinedNotify(Message message, Game game) throws IOException {
+        // iterate to all client
+        Enumeration<String> e = this.clientRoom.keys();
+        Integer idRoom = game.getIdRoom();
+        String joinedPerson = game.getUsername();
+
+//        System.out.println(message.getSender() + " : " + message.getText());
+
+        while (e.hasMoreElements()) {
+            String username = e.nextElement();
+            Integer roomUser = this.clientRoom.get(username);
+
+            if(roomUser == idRoom){
+                // send the message
+                message.setText(Log.ANSI_GREEN + joinedPerson + Log.ANSI_RESET + " has joined the room");
+                message.setRequest(false);
+                message.setChannel("4");
+                message.setSender("[Server]");
+                System.out.println(username);
+                String clientId = this.clientNameList.get(username);
+                ThreadClient threadClient = this.clientList.get(clientId);
+                threadClient.send(message);
+            }
+        }
+    }
 }

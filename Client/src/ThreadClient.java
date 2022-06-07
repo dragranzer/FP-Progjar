@@ -17,16 +17,13 @@ public class ThreadClient extends Thread {
 
     @Override
     public void run() {
+        try {
+            socket = new Socket("localhost", 6666);
+            objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         while (true) {
-            try {
-                socket = new Socket("localhost", 6666);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-
-            try {
-                objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
-
                 try {
                     System.out.println("masuk proc");
                     Object obj = this.objectInputStream.readObject();
@@ -43,9 +40,6 @@ public class ThreadClient extends Thread {
                 } catch (IOException | ClassNotFoundException e) {
                     e.printStackTrace();
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
     }
 
@@ -57,6 +51,9 @@ public class ThreadClient extends Thread {
                 }
                 else if(message.getChannel().equals("2")){
                     ch = "[Chat]";
+                }
+                else if(message.getChannel().equals("3")){
+                    ch = "[Server]";
                 }
                 System.out.println(message.getSender() + ch +" : " + message.getText());
             }else{
