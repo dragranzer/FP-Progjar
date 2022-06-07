@@ -11,6 +11,8 @@ public class Game implements Serializable {
     private Integer point;
     private Integer idRoom;
     private Integer sumPlayer;
+    private Boolean isEnd;
+    private String endMessage;
 
     private int x;
     private int y;
@@ -103,5 +105,21 @@ public class Game implements Serializable {
 
     public void setSumPlayer(Integer sumPlayer) {
         this.sumPlayer = sumPlayer;
+    }
+
+    public Boolean getEnd() {
+        return isEnd;
+    }
+
+    public void setEnd(Boolean end) {
+        isEnd = end;
+    }
+
+    public String getEndMessage() {
+        return endMessage;
+    }
+
+    public void setEndMessage(String endMessage) {
+        this.endMessage = endMessage;
     }
 }

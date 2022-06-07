@@ -94,6 +94,7 @@ public class CariUbi {
             int y=Math.abs(rand.nextInt())%10;
             //setelah ditemukan koordinat randomnya, jadikan array ubi pada koordinat n,y menjadi 'O' yang menandakan adanya ubi
             ubi[n][y]= -1;
+            System.out.println("Ending point "+y+" "+n);
             //masuk fungsi bermain
 //            cariubi();
     }

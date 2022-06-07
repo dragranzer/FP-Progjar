@@ -22,6 +22,10 @@ public class ThreadClient extends Thread {
             try{
                 Object obj = this.objectInputStream.readObject();
                 if(obj instanceof Message message){
+                    if(message.getEnd()!=null && message.getEnd()){
+                        System.out.println(message.getText());
+                        break;
+                    }
                     if(!message.getStart()){
                         messageProcess(message);
                     }else{
@@ -45,7 +49,17 @@ public class ThreadClient extends Thread {
                         System.out.println(Log.ANSI_YELLOW + "Menunggu "+game.getSumPlayer()+ " player lain join" + Log.ANSI_RESET);
                     }else if (game.getPrintPetak() && !game.getEnterOperate()){
                         printPetak(game);
+                        if(game.getEnd()!=null && game.getEnd()){
+                            System.out.println("Permainan Selesai");
+                            System.out.println(game.getEndMessage());
+                        }
                     }else if(game.getPrintPetak() && game.getEnterOperate()){
+                        System.out.println(game.getEnd());
+                        if(game.getEnd()!=null && game.getEnd()){
+                            System.out.println("Permainan Selesai");
+                            System.out.println(game.getEndMessage());
+                            continue;
+                        }
                         printPetak(game);
                         System.out.println("Masukkan Operasi ( +, -, *, /)");
                         String operation = sc.ReadString();
@@ -74,6 +88,8 @@ public class ThreadClient extends Thread {
                     }else{
                         System.out.println(Log.ANSI_RED + playerTurn + "'s turn" + Log.ANSI_RESET);
                     }
+                }else if(obj instanceof PlayerPoint playerPoint){
+                    System.out.println("Point anda : " + playerPoint.getPoint());
                 }else{
                     System.out.println("object asing terdeteksi");
                     System.out.println(obj.getClass().getName());

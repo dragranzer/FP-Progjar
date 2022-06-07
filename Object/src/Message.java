@@ -9,6 +9,7 @@ public class Message implements Serializable {
     private Boolean isStart;
     private Boolean host;
     private Integer id;
+    private Boolean isEnd;
 
     public String getSender() {
         return sender;
@@ -72,5 +73,13 @@ public class Message implements Serializable {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public Boolean getEnd() {
+        return isEnd;
+    }
+
+    public void setEnd(Boolean end) {
+        isEnd = end;
     }
 }

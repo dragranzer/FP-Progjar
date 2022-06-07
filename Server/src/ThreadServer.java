@@ -271,6 +271,54 @@ public class ThreadServer extends Thread {
         game.setUsername(clientName);
         game.setPoint(ubi[y][x]);
 
+
+        if (ubi[y][x] == -1){
+            game.setEnd(true);
+            System.out.println("Permainan Selesai");
+            Enumeration<String> e = this.clientRoom.keys();
+            int maxPoint = 0;
+            String minPlayer = "";
+            int minPoint = 100;
+            String maxPlayer = "";
+            while (e.hasMoreElements()) {
+                String username = e.nextElement();
+                int roomUser = this.clientRoom.get(username);
+
+                // send the message
+                if(roomUser == idRoom) {
+                    int pointPlayer = this.clientPoint.get(username);
+                    if(pointPlayer > maxPoint){
+                        maxPoint = pointPlayer;
+                        maxPlayer = username;
+                    }
+                    if(pointPlayer < minPoint){
+                        minPoint = pointPlayer;
+                        minPlayer = username;
+                    }
+                }
+            }
+            String playerKalah = "";
+            if(maxPoint > 40){
+                playerKalah = maxPlayer;
+            }else {
+                playerKalah = minPlayer;
+            }
+            Message msg = new Message();
+            msg.setText("Player kalah : " + playerKalah);
+            game.setEndMessage("Player kalah : " + playerKalah);
+            msg.setEnd(true);
+            while (e.hasMoreElements()) {
+                String username = e.nextElement();
+                int roomUser = this.clientRoom.get(username);
+                // send the message
+                if(roomUser == idRoom) {
+                    String id = this.clientNameList.get(username);
+                    ThreadClient threadClient = this.clientList.get(id);
+                    threadClient.send(msg);
+                }
+            }
+        }
+
         this.clientGame.replace(koordinat.getIdRoom(), map);
 
         Enumeration<String> e = this.clientRoom.keys();
@@ -318,7 +366,7 @@ public class ThreadServer extends Thread {
 
         String clientId = this.clientNameList.get(username);
         ThreadClient tc = this.clientList.get(clientId);
-//        tc.sendPoint(playerpoint);
+        tc.sendPoint(playerpoint);
         printTurn(idRoom);
     }
 
