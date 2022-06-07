@@ -25,15 +25,55 @@ public class ThreadClient extends Thread {
                     if(!message.getStart()){
                         messageProcess(message);
                     }else{
-                        System.out.println("Game bisa dimulai");
+                        System.out.println(Log.ANSI_GREEN + "Game bisa dimulai" + Log.ANSI_RESET);
+                        if(message.getHost()){
+                            System.out.println(Log.ANSI_BLUE + "You are the host. Type start play.." + Log.ANSI_RESET);
+                            String start = sc.ReadString();
+                            if(start.equalsIgnoreCase("start")){
+                                Command cmd = new Command();
+                                cmd.setStart(true);
+                                cmd.setId(message.getId());
+                                this.objectOutputStream.writeObject(cmd);
+                                this.objectOutputStream.flush();
+                                this.objectOutputStream.reset();
+                            }
+                        }
                     }
                 }else if(obj instanceof Game game){
                     if(game.getNewGame()){
-                        System.out.println("Menunggu "+game.getSumPlayer()+ " player lain join");
-                    }else{
+                        System.out.println(Log.ANSI_BLUE + "Room " + game.getIdRoom() + " telah dibuat" + Log.ANSI_RESET);
+                        System.out.println(Log.ANSI_YELLOW + "Menunggu "+game.getSumPlayer()+ " player lain join" + Log.ANSI_RESET);
+                    }else if (game.getPrintPetak() && !game.getEnterOperate()){
+                        printPetak(game);
+                    }else if(game.getPrintPetak() && game.getEnterOperate()){
+                        printPetak(game);
+                        System.out.println("Masukkan Operasi ( +, -, *, /)");
+                        String operation = sc.ReadString();
+                        Integer idRoom = game.getIdRoom();
+                        String username = game.getUsername();
+                        Integer point = game.getPoint();
 
+                        System.out.println(Log.ANSI_BLUE + operation + point + Log.ANSI_RESET);
+                        this.objectOutputStream.writeObject(PlayerPointObject.sendOperate(operation, username, point, idRoom));
+                        this.objectOutputStream.flush();
+                        this.objectOutputStream.reset();
                     }
-//                    gameProcess(game);
+                }else if(obj instanceof YourTurn yourTurn){
+                    String playerTurn = yourTurn.getPlayerTurn();
+                    Integer idRoom = yourTurn.getId();
+                    if(yourTurn.isYourturn()){
+                        System.out.println(Log.ANSI_BLUE + "Your turn" + Log.ANSI_RESET);
+                        System.out.println("Masukkan Koordinat X Y");
+                        Scanner scInt = new Scanner(System.in);
+                        int x = scInt.nextInt();
+                        int y = scInt.nextInt();
+
+                        this.objectOutputStream.writeObject(KoordinatObject.sendKoordinat(x , y, playerTurn, idRoom));
+                        this.objectOutputStream.flush();
+                        this.objectOutputStream.reset();
+                    }else{
+                        System.out.println(Log.ANSI_RED + playerTurn + "'s turn" + Log.ANSI_RESET);
+                    }
                 }else{
                     System.out.println("object asing terdeteksi");
                     System.out.println(obj.getClass().getName());
@@ -99,7 +139,7 @@ public class ThreadClient extends Thread {
                 Integer point = game.getPoint();
 
                 System.out.println(Log.ANSI_BLUE + operation + point + Log.ANSI_RESET);
-                this.objectOutputStream.writeObject(PlayerPointObject.sendOperate(operation, username, point));
+//                this.objectOutputStream.writeObject(PlayerPointObject.sendOperate(operation, username, point));
                 this.objectOutputStream.flush();
                 this.objectOutputStream.reset();
                 printPoint = false;

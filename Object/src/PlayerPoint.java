@@ -4,6 +4,7 @@ public class PlayerPoint implements Serializable {
     private Integer point;
     private String operation;
     private String username;
+    private Integer idRoom;
 
 
     public Integer getPoint() {
@@ -28,5 +29,13 @@ public class PlayerPoint implements Serializable {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public Integer getIdRoom() {
+        return idRoom;
+    }
+
+    public void setIdRoom(Integer idRoom) {
+        this.idRoom = idRoom;
     }
 }

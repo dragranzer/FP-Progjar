@@ -44,6 +44,12 @@ public class ThreadClient extends Thread {
         this.objectOutputStream.reset();
     }
 
+    public void sendYourTurn(YourTurn yourTurn) throws IOException {
+        this.objectOutputStream.writeObject(yourTurn);
+        this.objectOutputStream.flush();
+        this.objectOutputStream.reset();
+    }
+
     @Override
     public void run() {
         while (true) {
@@ -71,13 +77,16 @@ public class ThreadClient extends Thread {
                     else{
                         this.threadServer.joinRoom(game);
                     }
-                }else if(obj instanceof Koordinat koordinat){
-                    System.out.println("x : "+koordinat.getX());
-                    System.out.println("id room : "+koordinat.getIdRoom());
+                }else if(obj instanceof Command cmd){
+                    this.threadServer.startGame(cmd);
+                }
+                else if(obj instanceof Koordinat koordinat){
+//                    System.out.println("x : "+koordinat.getX());
+//                    System.out.println("id room : "+koordinat.getIdRoom());
                     this.threadServer.playGame(koordinat);
                 }else if(obj instanceof PlayerPoint playerPoint){
-                    System.out.println("masuk");
-                    System.out.println(playerPoint.getUsername());
+//                    System.out.println("masuk");
+//                    System.out.println(playerPoint.getUsername());
                     this.threadServer.changePoint(playerPoint);
                 }
             } catch (IOException | ClassNotFoundException e) {

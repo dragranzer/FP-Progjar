@@ -7,6 +7,8 @@ public class Message implements Serializable {
     private String channel;
     private Boolean request;
     private Boolean isStart;
+    private Boolean host;
+    private Integer id;
 
     public String getSender() {
         return sender;
@@ -54,5 +56,21 @@ public class Message implements Serializable {
 
     public void setStart(Boolean start) {
         isStart = start;
+    }
+
+    public Boolean getHost() {
+        return host;
+    }
+
+    public void setHost(Boolean host) {
+        this.host = host;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 }

@@ -1,10 +1,7 @@
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Scanner;
-import java.util.Set;
+import java.util.*;
 
 public class ThreadServer extends Thread {
     private Hashtable<String, ThreadClient> clientList;
@@ -13,6 +10,8 @@ public class ThreadServer extends Thread {
     private Hashtable<String, Integer> clientPoint;
     private Hashtable<String, Integer> clientRoom;
     private Hashtable<Integer, Integer> SumPlayersRoom;
+    private Hashtable<Integer, String> hostRoom;
+    private Hashtable<Integer, Turn> turnOrder;
     private Integer IdRoom;
     private ServerSocket serverSocket;
 
@@ -25,6 +24,8 @@ public class ThreadServer extends Thread {
         this.clientPoint = new Hashtable<>();
         this.clientRoom = new Hashtable<>();
         this.SumPlayersRoom = new Hashtable<>();
+        this.hostRoom = new Hashtable<>();
+        this.turnOrder = new Hashtable<>();
         this.IdRoom = 0;
     }
 
@@ -136,8 +137,10 @@ public class ThreadServer extends Thread {
         if(!this.clientGame.containsKey(this.IdRoom)){
             this.clientGame.put(this.IdRoom, new Map());
             System.out.println("Berhasil membuat room");
+
             this.clientRoom.put(clientName, this.IdRoom);
             System.out.println("Host Room "+ this.IdRoom + "= " + clientName);
+            this.hostRoom.put(this.IdRoom, clientName);
         } else
             System.out.println("Gagal membuat room");
 
@@ -153,10 +156,8 @@ public class ThreadServer extends Thread {
         game.setTanah(app.getTanah());
         game.setUbi(app.getUbi());
         game.setPrintPetak(true);
-        game.setPoint(0);
         game.setIdRoom(this.IdRoom);
         game.setNewGame(true);
-        game.setSumPlayer(game.getSumPlayer()-1);
 
         this.clientPoint.put(game.getUsername(), 0);
         this.clientGame.replace(this.IdRoom, map);
@@ -165,13 +166,89 @@ public class ThreadServer extends Thread {
         tc.sendGame(game);
     }
 
+    public void startGame(Command cmd) throws IOException {
+        Integer idRoom = cmd.getId();
+
+        //set game to send it for the first time
+        Map map = this.clientGame.get(cmd.getId());
+        int[][] tanah = map.getTanah();
+        int[][] ubi = map.getUbi();
+        Game game = new Game();
+        game.setTanah(map.getTanah());
+        game.setUbi(map.getUbi());
+        game.setEnterOperate(false);
+        game.setNewGame(false);
+        game.setPrintPetak(true);
+        game.setIdRoom(idRoom);
+
+        //assign room member to arraylist
+        ArrayList<String> al = new ArrayList<>();
+        Enumeration<String> e = this.clientRoom.keys();
+        while (e.hasMoreElements()) {
+            String username = e.nextElement();
+            int roomUser = this.clientRoom.get(username);
+            if(roomUser == idRoom) {
+                al.add(username);
+                String id = this.clientNameList.get(username);
+                ThreadClient threadClient = this.clientList.get(id);
+                threadClient.sendGame(game);
+            }
+        }
+        //randomize turn
+        Random r1 = new Random();
+        for (int i = al.size() - 1; i >= 1; i--) {
+            // swapping current index value
+            // with random index value
+            Collections.swap(al, i, r1.nextInt(i + 1));
+        }
+
+        Turn turn = new Turn();
+        turn.setTurnOrder(al);
+        turn.setIndex(0);
+
+        this.turnOrder.put(idRoom, turn);
+        System.out.println("masuk start");
+
+        printTurn(idRoom);
+    }
+
+    public void printTurn(Integer idRoom) throws IOException {
+        Turn turn = this.turnOrder.get(idRoom);
+        ArrayList<String> al = turn.getTurnOrder();
+
+        int index = turn.getIndex();
+
+        String playerTurn = al.get(index);
+        if(index + 1 < al.size()){
+            turn.setIndex(index+1);
+        }else{
+            turn.setIndex(0);
+        }
+        this.turnOrder.replace(idRoom, turn);
+
+        //send to room member with turn set
+        YourTurn yourTurn = new YourTurn();
+        Enumeration<String> e = this.clientRoom.keys();
+        while (e.hasMoreElements()) {
+            String username = e.nextElement();
+            int roomUser = this.clientRoom.get(username);
+            if(roomUser == idRoom) {
+                yourTurn.setYourturn(username.equals(playerTurn));
+                yourTurn.setPlayerTurn(playerTurn);
+                yourTurn.setId(idRoom);
+                String id = this.clientNameList.get(username);
+                ThreadClient threadClient = this.clientList.get(id);
+                threadClient.sendYourTurn(yourTurn);
+            }
+        }
+    }
     public void playGame(Koordinat koordinat) throws IOException {
+        Integer idRoom = koordinat.getIdRoom();
         Integer x = koordinat.getX();
         Integer y = koordinat.getY();
 
         String clientName = koordinat.getUsername();
-        String clientId = this.clientNameList.get(clientName);
-        ThreadClient tc = this.clientList.get(clientId);
+
 
         Map map = this.clientGame.get(koordinat.getIdRoom());
         int[][] tanah = map.getTanah();
@@ -187,16 +264,34 @@ public class ThreadServer extends Thread {
         Game game = new Game();
         game.setTanah(tanah);
         game.setUbi(ubi);
+        game.setIdRoom(idRoom);
+        game.setNewGame(false);
         game.setPrintPetak(true);
         game.setEnterOperate(true);
         game.setUsername(clientName);
         game.setPoint(ubi[y][x]);
 
         this.clientGame.replace(koordinat.getIdRoom(), map);
-        tc.sendGame(game);
+
+        Enumeration<String> e = this.clientRoom.keys();
+        while (e.hasMoreElements()) {
+            String username = e.nextElement();
+            int roomUser = this.clientRoom.get(username);
+            if(roomUser == idRoom) {
+                if(username.equals(clientName)){
+                    game.setEnterOperate(true);
+                }else{
+                    game.setEnterOperate(false);
+                }
+                String clientId = this.clientNameList.get(username);
+                ThreadClient tc = this.clientList.get(clientId);
+                tc.sendGame(game);
+            }
+        }
     }
 
     public void changePoint(PlayerPoint playerpoint) throws IOException {
+        Integer idRoom = playerpoint.getIdRoom();
         String username = playerpoint.getUsername();
         System.out.println((username));
 
@@ -223,7 +318,8 @@ public class ThreadServer extends Thread {
 
         String clientId = this.clientNameList.get(username);
         ThreadClient tc = this.clientList.get(clientId);
-        tc.sendPoint(playerpoint);
+//        tc.sendPoint(playerpoint);
+        printTurn(idRoom);
     }
 
     public void joinRoom(Game game) throws IOException {
@@ -234,6 +330,7 @@ public class ThreadServer extends Thread {
             int sumPlayer = this.SumPlayersRoom.get(idRoom);
             this.SumPlayersRoom.replace(idRoom, sumPlayer-1);
             this.clientRoom.put(username, idRoom);
+            this.clientPoint.put(game.getUsername(), 0);
             String clientId = this.clientNameList.get(username);
             ThreadClient tc = this.clientList.get(clientId);
             Message msg = new Message();
@@ -244,6 +341,7 @@ public class ThreadServer extends Thread {
             //to self
             if(sumPlayer-1 == 0){
                 msg.setStart(true);
+                msg.setId(idRoom);
                 Enumeration<String> e = this.clientRoom.keys();
                 while (e.hasMoreElements()) {
                     username = e.nextElement();
@@ -251,6 +349,11 @@ public class ThreadServer extends Thread {
 //                    System.out.println(idRoom + " vs " + roomUser);
                     // send the message
                     if(roomUser == idRoom) {
+                        String host = this.hostRoom.get(idRoom);
+                        if(username.equals(host)){
+                            msg.setHost(true);
+                        }else
+                            msg.setHost(false);
                         String id = this.clientNameList.get(username);
                         ThreadClient threadClient = this.clientList.get(id);
                         threadClient.send(msg);
@@ -268,10 +371,6 @@ public class ThreadServer extends Thread {
         }else{
             System.out.println("Room tidak ditemukan");
         }
-
-    }
-
-    public void dataGameProcess(Game game) throws IOException, ClassNotFoundException {
 
     }
 
