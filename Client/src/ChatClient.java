@@ -17,8 +17,8 @@ public class ChatClient {
                 online = true;
 
                 ObjectOutputStream objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
-                ThreadClient threadClient = new ThreadClient(new ObjectInputStream(socket.getInputStream()));
-                threadClient.start();
+//                ThreadClient threadClient = new ThreadClient(new ObjectInputStream(socket.getInputStream()));
+//                threadClient.start();
 
                 objectOutputStream.writeObject(UserObject.getLogin(username));
                 objectOutputStream.flush();
@@ -58,13 +58,23 @@ public class ChatClient {
                             Scanner scInt = new Scanner(System.in);
                             choice = scInt.nextInt();
                             if(choice == 1){
-                                objectOutputStream.writeObject(GameObject.newGame(username));
+                                System.out.println("Masukkan jumlah player:");
+                                Integer sumPlayer = scInt.nextInt();
+                                objectOutputStream.writeObject(GameObject.newGame(username, sumPlayer));
                                 objectOutputStream.flush();
+                                objectOutputStream.reset();
+                                ThreadClient threadClient = new ThreadClient(new ObjectInputStream(socket.getInputStream()), objectOutputStream);
+                                threadClient.start();
+
                             }else if(choice == 2){
                                 System.out.println("Masukkan id Room:");
                                 Integer idRoom = scInt.nextInt();
                                 objectOutputStream.writeObject(GameObject.joinGame(idRoom,username));
                                 objectOutputStream.flush();
+                                objectOutputStream.reset();
+                                ThreadClient threadClient = new ThreadClient(new ObjectInputStream(socket.getInputStream()), objectOutputStream);
+                                threadClient.start();
+
                             }
                         }
                         case "4" -> {

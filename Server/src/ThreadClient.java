@@ -7,12 +7,14 @@ public class ThreadClient extends Thread {
     private ObjectOutputStream objectOutputStream;
     private ObjectInputStream objectInputStream;
     private ThreadServer threadServer;
+    private Socket socket;
 
     public ThreadClient(Socket socket, ThreadServer threadServer) {
         try {
             this.objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
             this.objectInputStream = new ObjectInputStream(socket.getInputStream());
             this.threadServer = threadServer;
+            this.socket = socket;
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -21,6 +23,13 @@ public class ThreadClient extends Thread {
     public void send(Message message) throws IOException {
         this.objectOutputStream.writeObject(message);
         this.objectOutputStream.flush();
+        this.objectOutputStream.reset();
+    }
+
+    public void sendString(String message) throws IOException {
+        this.objectOutputStream.write(message.getBytes());
+        this.objectOutputStream.flush();
+        this.objectOutputStream.reset();
     }
 
     public void sendGame(Game game) throws IOException {

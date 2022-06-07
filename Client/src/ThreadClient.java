@@ -7,41 +7,43 @@ import java.util.Scanner;
 public class ThreadClient extends Thread {
     private ObjectInputStream objectInputStream;
     Read sc = new Read();
-    ObjectOutputStream objectOutputStream;
+    private ObjectOutputStream objectOutputStream;
     Socket socket;
 
 
-    public ThreadClient(ObjectInputStream objectInputStream) {
+    public ThreadClient(ObjectInputStream objectInputStream, ObjectOutputStream objectOutputStream) {
         this.objectInputStream = objectInputStream;
+        this.objectOutputStream = objectOutputStream;
     }
 
     @Override
     public void run() {
-        try {
-            socket = new Socket("localhost", 6666);
-            objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
         while (true) {
-                try {
-                    System.out.println("masuk proc");
-                    Object obj = this.objectInputStream.readObject();
-                    if(obj instanceof Message message){
+            try{
+                Object obj = this.objectInputStream.readObject();
+                if(obj instanceof Message message){
+                    if(!message.getStart()){
                         messageProcess(message);
+                    }else{
+                        System.out.println("Game bisa dimulai");
                     }
-                    if(obj instanceof Game game){
-                        if(game.getNewGame()){
-                            System.out.println("Ketik start untuk mulai:");
-                        }
-                        gameProcess(game);
-                    }
+                }else if(obj instanceof Game game){
+                    if(game.getNewGame()){
+                        System.out.println("Menunggu "+game.getSumPlayer()+ " player lain join");
+                    }else{
 
-                } catch (IOException | ClassNotFoundException e) {
-                    e.printStackTrace();
+                    }
+//                    gameProcess(game);
+                }else{
+                    System.out.println("object asing terdeteksi");
+                    System.out.println(obj.getClass().getName());
                 }
+            }catch (IOException | ClassNotFoundException e) {
+                e.printStackTrace();
+            }
         }
     }
+
 
     public void messageProcess(Message message){
         String ch = "";
@@ -65,10 +67,10 @@ public class ThreadClient extends Thread {
         int x = 0,y = 0;
         boolean printPoint = false;
         if(game.getPrintPetak()){
-            if(game.getNewGame()){
-                Read sc = new Read();
-                String username = sc.ReadString();
-            }
+//            if(game.getNewGame()){
+//                Read sc = new Read();
+//                String username = sc.ReadString();
+//            }
             printPetak(game);
         }
         do{
@@ -85,8 +87,9 @@ public class ThreadClient extends Thread {
 
                 Integer idRoom = game.getIdRoom();
 
-                objectOutputStream.writeObject(KoordinatObject.sendKoordinat(x,y,game.getUsername(),idRoom));
-                objectOutputStream.flush();
+                this.objectOutputStream.writeObject(KoordinatObject.sendKoordinat(x,y,game.getUsername(),idRoom));
+                this.objectOutputStream.flush();
+                this.objectOutputStream.reset();
 
                 printPoint = true;
             } else {
@@ -96,8 +99,9 @@ public class ThreadClient extends Thread {
                 Integer point = game.getPoint();
 
                 System.out.println(Log.ANSI_BLUE + operation + point + Log.ANSI_RESET);
-                objectOutputStream.writeObject(PlayerPointObject.sendOperate(operation, username, point));
-                objectOutputStream.flush();
+                this.objectOutputStream.writeObject(PlayerPointObject.sendOperate(operation, username, point));
+                this.objectOutputStream.flush();
+                this.objectOutputStream.reset();
                 printPoint = false;
             }
 

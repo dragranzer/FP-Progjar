@@ -6,6 +6,7 @@ public class Message implements Serializable {
     private String receiver;
     private String channel;
     private Boolean request;
+    private Boolean isStart;
 
     public String getSender() {
         return sender;
@@ -45,5 +46,13 @@ public class Message implements Serializable {
 
     public void setChannel(String channel) {
         this.channel = channel;
+    }
+
+    public Boolean getStart() {
+        return isStart;
+    }
+
+    public void setStart(Boolean start) {
+        isStart = start;
     }
 }

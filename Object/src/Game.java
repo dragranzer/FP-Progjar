@@ -10,6 +10,7 @@ public class Game implements Serializable {
     private String username;
     private Integer point;
     private Integer idRoom;
+    private Integer sumPlayer;
 
     private int x;
     private int y;
@@ -94,5 +95,13 @@ public class Game implements Serializable {
 
     public void setIdRoom(Integer idRoom) {
         this.idRoom = idRoom;
+    }
+
+    public Integer getSumPlayer() {
+        return sumPlayer;
+    }
+
+    public void setSumPlayer(Integer sumPlayer) {
+        this.sumPlayer = sumPlayer;
     }
 }
